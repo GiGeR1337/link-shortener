@@ -5,19 +5,23 @@ import com.example.tpo10.Models.LinkDTO;
 import com.example.tpo10.Models.LinkResponse;
 import com.example.tpo10.Models.UpdateLinkDTO;
 import com.example.tpo10.Repositories.LinkRepository;
+import jakarta.validation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Random;
+import java.util.Set;
 
 @Service
 public class LinkService {
 
     private final LinkRepository linkRepository;
+    private final Validator validator;
 
-    public LinkService(LinkRepository linkRepository) {
+    public LinkService(LinkRepository linkRepository, Validator validator) {
         this.linkRepository = linkRepository;
+        this.validator = validator;
     }
 
     private String generateId() {
@@ -31,17 +35,16 @@ public class LinkService {
     }
 
     public LinkResponse createLink(LinkDTO linkDTO){
+
         String id = generateId();
         while(linkRepository.existsById(id)){
             id = generateId();
         }
-
         Link link = new Link();
         link.setId(id);
         link.setName(linkDTO.getName());
         link.setTargetUrl(linkDTO.getTargetUrl());
         link.setPassword(linkDTO.getPassword());
-        System.out.println("DTO password: " + linkDTO.getPassword());
         link.setVisits(0);
         linkRepository.save(link);
 
@@ -51,6 +54,19 @@ public class LinkService {
     public LinkResponse getLink(String id){
         return linkRepository.findById(id).map(this::mapper)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    public LinkResponse getLinkWithPasswordCheck(String id, String password) {
+        Link link = linkRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (link.getPassword() != null && !link.getPassword().isBlank()) {
+            if (password == null || !link.getPassword().equals(password)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Wrong password");
+            }
+        }
+
+        return mapper(link);
     }
 
     public String getRedirectUrl(String id) {
