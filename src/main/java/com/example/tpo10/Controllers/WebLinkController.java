@@ -44,6 +44,12 @@ public class WebLinkController {
         return "redirect:/links/homepage";
     }
 
+    @GetMapping("/all")
+    public String getLinks(Model model){
+        model.addAttribute("links", linkService.getAllLinks());
+        return "get-links";
+    }
+
     @GetMapping("/info")
     public String showAccessForm(@RequestParam(required = false) String id, Model model) {
         model.addAttribute("id", id);

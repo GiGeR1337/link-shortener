@@ -13,7 +13,7 @@ public class UpdateLinkDTO {
     @UniqueUrl
     private String targetUrl;
 
-    @ValidPassword
+//    @ValidPassword
     private String password;
 
     public String getName() {

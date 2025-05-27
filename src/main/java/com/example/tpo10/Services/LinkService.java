@@ -10,18 +10,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class LinkService {
 
     private final LinkRepository linkRepository;
-    private final Validator validator;
 
-    public LinkService(LinkRepository linkRepository, Validator validator) {
+    public LinkService(LinkRepository linkRepository) {
         this.linkRepository = linkRepository;
-        this.validator = validator;
     }
 
     private String generateId() {
@@ -56,12 +53,18 @@ public class LinkService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
+    public List<LinkResponse> getAllLinks() {
+        List<LinkResponse> responses = new ArrayList<>();
+        linkRepository.findAll().forEach(link -> responses.add(mapper(link)));
+        return responses;
+    }
+
     public LinkResponse getLinkWithPasswordCheck(String id, String password) {
         Link link = linkRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         if (link.getPassword() != null && !link.getPassword().isBlank()) {
-            if (password == null || !link.getPassword().equals(password)) {
+            if (!link.getPassword().equals(password)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Wrong password");
             }
         }
@@ -84,7 +87,7 @@ public class LinkService {
 
         if(link.getPassword() != null){
             if(updateLinkDTO.getPassword() == null || !updateLinkDTO.getPassword().equals(link.getPassword()))
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "wrong password");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Wrong password");
         }
 
         if(updateLinkDTO.getName() != null) link.setName(updateLinkDTO.getName());
@@ -100,7 +103,7 @@ public class LinkService {
 
         if (link.getPassword() != null) {
             if (!link.getPassword().equals(password)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "wrong password");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Wrong password");
             }
         }
 

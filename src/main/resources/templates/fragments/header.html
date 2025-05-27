@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+<div th:fragment="language-switcher">
+  <header class="d-flex justify-content-end mb-4">
+    <form method="get" th:action="@{/links/homepage}" class="d-inline">
+      <select name="lang" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+        <option value="en" th:selected="${#locale.language == 'en'}">English</option>
+        <option value="pl" th:selected="${#locale.language == 'pl'}">Polish</option>
+        <option value="de" th:selected="${#locale.language == 'de'}">German</option>
+      </select>
+    </form>
+  </header>
+</div>
+</body>
+</html>
