@@ -5,13 +5,10 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 public class UniqueUrlValidator implements ConstraintValidator<UniqueUrl, String> {
-
     private final LinkRepository linkRepository;
-
     public UniqueUrlValidator(LinkRepository linkRepository) {
         this.linkRepository = linkRepository;
     }
-
     @Override
     public boolean isValid(String targetUrl, ConstraintValidatorContext context) {
         return !linkRepository.existsByTargetUrl(targetUrl);

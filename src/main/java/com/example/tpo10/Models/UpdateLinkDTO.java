@@ -12,8 +12,6 @@ public class UpdateLinkDTO {
     @Pattern(regexp = "^https://.*", message = "{url.https}")
     @UniqueUrl
     private String targetUrl;
-
-//    @ValidPassword
     private String password;
 
     public String getName() {
